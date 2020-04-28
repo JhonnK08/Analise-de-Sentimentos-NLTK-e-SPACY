@@ -29,21 +29,29 @@ pontuacao = string.punctuation
 #WORDNET AFFECT
 #with open('D:\Github\TCC\DICIONÁRIOS\wordNetAffect\wordnetaffectbr_valencia.csv', 'r', encoding='utf8') as wordnet:
 
-wordnet = pandas.read_csv('D:\Github\TCC\DICIONÁRIOS\wordNetAffect\wordnetaffectbr_valencia2.csv', encoding='utf8')
+#wordnet = pandas.read_csv('D:\Github\TCC\DICIONÁRIOS\wordNetAffect\wordnetaffectbr_valencia2.csv', encoding='utf8')
 
 #wordnet.shape
 #print(wordnet.head())
 
 #lexicon-pt
-with open('D:\Github\TCC\DICIONÁRIOS\lexiconPT-master\data-raw\lexico_v2.txt', 'r', encoding='utf8') as lexicon:
-    lexicon = csv.reader(lexicon, delimiter=',')
+#with open('D:\Github\TCC\DICIONÁRIOS\lexiconPT-master\data-raw\lexico_v2.txt', 'r', encoding='utf8') as lexicon:
+#    lexicon = csv.reader(lexicon, delimiter=',')
 
 #oplexicon
-with open('D:\Github\TCC\DICIONÁRIOS\oplexicon_v3.0\lexico_v3.0.txt', 'r', encoding='utf8') as oplexicon:
-    oplexicon = csv.reader(oplexicon, delimiter=',')
+#with open('D:\Github\TCC\DICIONÁRIOS\oplexicon_v3.0\lexico_v3.0.txt', 'r', encoding='utf8') as oplexicon:
+#    oplexicon = csv.reader(oplexicon, delimiter=',')
+
+lexicon = pandas.read_csv('DICIONÁRIOS\lexiconPT-master\data-raw\lexico_v2.txt', encoding='utf8', delimiter=',', low_memory=False)
+oplexicon = pandas.read_csv('DICIONÁRIOS\oplexicon_v3.0\lexico_v3.0.txt', encoding='utf8', delimiter=',', low_memory=False)
 
 
-chat0104 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-3.csv', encoding='utf8', delimiter=';')
+chat0104 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-2.csv', encoding='utf8', delimiter=';', low_memory=False)
+chat0107 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-2.csv', encoding='utf8', delimiter=';', low_memory=False)
+chat0507 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_05_07\Chat_ATIV_05_07-2.csv', encoding='utf8', delimiter=';', low_memory=False)
+chat0810 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_08_10\Chat_ATIV_08_10-2.csv', encoding='utf8', delimiter=';', low_memory=False)
+
+#chat0104 = chat0104.astype(str)
 #with open('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04.csv', 'r', encoding='utf8') as chat0104:
 #    chat0104 = csv.reader(chat0104, delimiter=';')
 #    #dados = [][]
@@ -56,6 +64,8 @@ chat0104 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01
 #            alunos.append(row[2])
 #            mensagens.append(row[4])
 
+
+
 #Pré-processamento
 def Preprocessamento(texto) :
     texto = str(texto)
@@ -64,7 +74,7 @@ def Preprocessamento(texto) :
     lista = []
     #Tokenizacao
     for token in documento:
-        #lista.append(token)
+        #lista.append(token.text)
         lista.append(token.lemma_)
     lista = [palavra for palavra in lista if palavra not in stopwords and palavra not in pontuacao] # retira stopwords
     lista = ' '.join([str(elemento) for elemento in lista if not elemento.isdigit()]) # retira digitos
@@ -92,15 +102,20 @@ def Stopwords (frase):
     print('Stopwords:')
     for token in frase :
         if not token.is_stop :
-            frasePOS.append(token)
+            frase.append(token)
         else :
             print(token)
 
 
 
-
 chat0104['MENSAGEM'] = chat0104['MENSAGEM'].apply(Preprocessamento)
-print(chat0104.head(10))
+chat0104.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-lemma.csv', index = False)
+chat0107['MENSAGEM'] = chat0107['MENSAGEM'].apply(Preprocessamento)
+chat0107.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-lemma.csv', index = False)
+chat0507['MENSAGEM'] = chat0507['MENSAGEM'].apply(Preprocessamento)
+chat0507.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_05_07\Chat_ATIV_05_07-lemma.csv', index = False)
+chat0810['MENSAGEM'] = chat0810['MENSAGEM'].apply(Preprocessamento)
+chat0810.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_08_10\Chat_ATIV_08_10-lemma.csv', index = False)
 #frase = nlp(mensagens[2])
 #displacy.serve(frase, style='dep')
 #Tokenizar(frase)
