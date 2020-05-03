@@ -3,10 +3,12 @@ import csv
 import pandas
 import string
 import seaborn
+import matplotlib.pyplot as plt
 import numpy
 import spacy
 from spacy import displacy
 from spacy.lang.pt.stop_words import STOP_WORDS
+
 stopwords = STOP_WORDS
 nlp = spacy.load("pt_core_news_sm")
 alunos = []
@@ -26,24 +28,55 @@ pontuacao = string.punctuation
 #                line_count += 1
 #        print(f'Processed {line_count} lines.')
 
-#WORDNET AFFECT
-#with open('D:\Github\TCC\DICIONÁRIOS\wordNetAffect\wordnetaffectbr_valencia.csv', 'r', encoding='utf8') as wordnet:
+dicionario = {}
 
-#wordnet = pandas.read_csv('D:\Github\TCC\DICIONÁRIOS\wordNetAffect\wordnetaffectbr_valencia2.csv', encoding='utf8')
 
-#wordnet.shape
-#print(wordnet.head())
+with open('DICIONÁRIOS\oplexicon_v3.0\oplexicon.csv', encoding='utf8') as csvfile:
+     lines = csv.reader(csvfile, delimiter=';')
+     oplexico = list(lines)
+     for i in range(len(oplexico)):
+         if i > 0:
+             palavra = oplexico[i][0]
+             polaridade = oplexico[i][1]
+             print(palavra, polaridade)
+             dicionario[palavra] = polaridade
 
-#lexicon-pt
-#with open('D:\Github\TCC\DICIONÁRIOS\lexiconPT-master\data-raw\lexico_v2.txt', 'r', encoding='utf8') as lexicon:
-#    lexicon = csv.reader(lexicon, delimiter=',')
 
-#oplexicon
-#with open('D:\Github\TCC\DICIONÁRIOS\oplexicon_v3.0\lexico_v3.0.txt', 'r', encoding='utf8') as oplexicon:
-#    oplexicon = csv.reader(oplexicon, delimiter=',')
 
-lexicon = pandas.read_csv('DICIONÁRIOS\lexiconPT-master\data-raw\lexico_v2.txt', encoding='utf8', delimiter=',', low_memory=False)
-oplexicon = pandas.read_csv('DICIONÁRIOS\oplexicon_v3.0\lexico_v3.0.txt', encoding='utf8', delimiter=',', low_memory=False)
+with open('DICIONÁRIOS\lexiconPT-master\data-raw\lexicon.csv', encoding='utf8') as csvfile:
+    lines = csv.reader(csvfile, delimiter=';')
+    lexicon = list(lines)
+    for i in range(len(lexicon)):
+        if i > 0:
+            palavra = lexicon[i][0]
+            polaridade = lexicon[i][1]
+            print(palavra, polaridade)
+            dicionario[palavra] = polaridade
+
+
+
+with open('DICIONÁRIOS\wordNetAffect\wordnet.csv') as csvfile:
+    lines = csv.reader(csvfile, delimiter=';')
+    wordnet = list(lines)
+    for i in range(len(wordnet)):
+        if i > 0:
+            palavra = wordnet[i][0]
+            polaridade = wordnet[i][1]
+            print(palavra, polaridade)
+            dicionario[palavra] = polaridade
+
+
+
+with open('DICIONÁRIOS\senticnet-1.3\senticnet_pt.csv', encoding='utf8') as csvfile:
+    lines = csv.reader(csvfile, delimiter=';')
+    senticnet = list(lines)
+    for i in range(len(senticnet)):
+        if i > 0:
+            palavra = senticnet[i][0]
+            polaridade = senticnet[i][1]
+            #print(palavra, polaridade)
+            dicionario[palavra] = polaridade
+
 
 
 chat0104 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-2.csv', encoding='utf8', delimiter=';', low_memory=False)
@@ -67,7 +100,7 @@ chat0810 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_08_10\Chat_ATIV_08
 
 
 #Pré-processamento
-def Preprocessamento(texto) :
+def Preprocessamento(texto):
     texto = str(texto)
     texto = texto.lower()
     documento = nlp(texto)
@@ -76,51 +109,79 @@ def Preprocessamento(texto) :
     for token in documento:
         #lista.append(token.text)
         lista.append(token.lemma_)
-    lista = [palavra for palavra in lista if palavra not in stopwords and palavra not in pontuacao] # retira stopwords
-    lista = ' '.join([str(elemento) for elemento in lista if not elemento.isdigit()]) # retira digitos
-
+    lista = [palavra for palavra in lista if palavra not in stopwords and palavra not in pontuacao and not palavra.isdigit()] # retira stopwords
+    #lista = ' '.join([str(elemento) for elemento in lista if not elemento.isdigit()]) # retira digitos
     return lista
 
 
 #TUDO
-def Tudo(frase) :
-    for token in frase :
+def Tudo(frase):
+    for token in frase:
         print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
 
-
 #POS
-def POS (frase) :
-    for token in frase :
+def POS (frase):
+    for token in frase:
         print(token.text, token.pos_)
+
 #Procura de entidades
-def Entidades (frase) :
-    for entidade in frase.ents :
+def Entidades (frase):
+    for entidade in frase.ents:
         print(entidade.text, entidade.label_)
 
 #STOPWORDS
 def Stopwords (frase):
     print('Stopwords:')
-    for token in frase :
-        if not token.is_stop :
+    for token in frase:
+        if not token.is_stop:
             frase.append(token)
-        else :
+        else:
             print(token)
 
+#POLARIDADE DA PALAVRA
+def Polaridade (frase):
+    frasepolaridade = []
+    for i in frase:
+        print(i)
+        frasepolaridade.append(float(dicionario.get(i, 0)))
+        #print(frasepolaridade)
+    score = sum(frasepolaridade)
+    return score
 
+#ANALISE DE SENTIMENTO
+def analises(frase):
+    print('Frase: ' + frase)
+    fraseprocessada = Preprocessamento(frase)
+    fraseprocessada2 = ' '.join([str(elemento) for elemento in fraseprocessada])
+    scorefrase = Polaridade(fraseprocessada)
+    #print('Score da frase: ' + str(scorefrase))
+    if scorefrase > 0:
+        print('Positiva')
+    elif scorefrase == 0:
+        print('Neutra')
+    elif scorefrase < 0:
+        print('Negativo')
+    print(fraseprocessada2 + ' , ' + str(scorefrase))
+    return scorefrase
 
-chat0104['MENSAGEM'] = chat0104['MENSAGEM'].apply(Preprocessamento)
-chat0104.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-lemma.csv', index = False)
-chat0107['MENSAGEM'] = chat0107['MENSAGEM'].apply(Preprocessamento)
-chat0107.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-lemma.csv', index = False)
-chat0507['MENSAGEM'] = chat0507['MENSAGEM'].apply(Preprocessamento)
-chat0507.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_05_07\Chat_ATIV_05_07-lemma.csv', index = False)
-chat0810['MENSAGEM'] = chat0810['MENSAGEM'].apply(Preprocessamento)
-chat0810.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_08_10\Chat_ATIV_08_10-lemma.csv', index = False)
+scores = []
+scores = chat0104['MENSAGEM'].apply(analises)
+chat0104dic = pandas.DataFrame(chat0104)
+chat0104dic['POLARIDADE'] = scores
+chat0104dic.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-analise.csv', index = False)
+#chat0107['MENSAGEM'] = chat0107['MENSAGEM'].apply(Preprocessamento)
+#chat0107.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-lemma.csv', index = False)
+#chat0507['MENSAGEM'] = chat0507['MENSAGEM'].apply(Preprocessamento)
+#chat0507.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_05_07\Chat_ATIV_05_07-lemma.csv', index = False)
+#chat0810['MENSAGEM'] = chat0810['MENSAGEM'].apply(Preprocessamento)
+#chat0810.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_08_10\Chat_ATIV_08_10-lemma.csv', index = False)
 #frase = nlp(mensagens[2])
 #displacy.serve(frase, style='dep')
 #Tokenizar(frase)
 #Stopwords(frase)
 #Lematizacao(frasePOS)
+
+
 
 
 
