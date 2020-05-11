@@ -78,6 +78,18 @@ with open('DICIONÁRIOS\senticnet-1.3\senticnet_pt.csv', encoding='utf8') as csv
             dicionario[palavra] = polaridade
 
 
+with open(r'DICIONÁRIOS\UNILEX\TB_SYM_04.csv', encoding='utf8') as csvfile:
+    lines = csv.reader(csvfile, delimiter=';')
+    unilex = list(lines)
+    for i in range(len(unilex)):
+        if i > 0:
+            palavra = unilex[i][0]
+            polaridade = unilex[i][1]
+            print(palavra, polaridade)
+            dicionario[palavra] = polaridade
+
+
+
 
 chat0104 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-2.csv', encoding='utf8', delimiter=';', low_memory=False)
 chat0107 = pandas.read_csv('ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-2.csv', encoding='utf8', delimiter=';', low_memory=False)
