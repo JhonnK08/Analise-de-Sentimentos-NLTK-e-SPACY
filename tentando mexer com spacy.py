@@ -38,7 +38,7 @@ with open('DICIONÁRIOS\oplexicon_v3.0\oplexicon.csv', encoding='utf8') as csvfi
          if i > 0:
              palavra = oplexico[i][0]
              polaridade = oplexico[i][1]
-             print(palavra, polaridade)
+             #print(palavra, polaridade)
              dicionario[palavra] = polaridade
 
 
@@ -50,7 +50,7 @@ with open('DICIONÁRIOS\lexiconPT-master\data-raw\lexicon.csv', encoding='utf8')
         if i > 0:
             palavra = lexicon[i][0]
             polaridade = lexicon[i][1]
-            print(palavra, polaridade)
+            #print(palavra, polaridade)
             dicionario[palavra] = polaridade
 
 
@@ -62,7 +62,7 @@ with open('DICIONÁRIOS\wordNetAffect\wordnet.csv') as csvfile:
         if i > 0:
             palavra = wordnet[i][0]
             polaridade = wordnet[i][1]
-            print(palavra, polaridade)
+            #print(palavra, polaridade)
             dicionario[palavra] = polaridade
 
 
@@ -168,7 +168,7 @@ scores = []
 scores = chat0104['MENSAGEM'].apply(analises)
 chat0104dic = pandas.DataFrame(chat0104)
 chat0104dic['POLARIDADE'] = scores
-chat0104dic.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-analise.csv', index = False)
+chat0104dic.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-analise-spacy.csv', index = False)
 #chat0107['MENSAGEM'] = chat0107['MENSAGEM'].apply(Preprocessamento)
 #chat0107.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_07\Chat_ATIV_01_07-lemma.csv', index = False)
 #chat0507['MENSAGEM'] = chat0507['MENSAGEM'].apply(Preprocessamento)

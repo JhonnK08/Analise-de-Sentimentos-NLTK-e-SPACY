@@ -6,6 +6,7 @@ import string
 import seaborn
 import numpy
 import pickle
+import spacy
 
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
@@ -16,6 +17,8 @@ from nltk.stem import WordNetLemmatizer
 
 dicionario = {}
 lemmas = WordNetLemmatizer()
+stopwords = nltk.corpus.stopwords.words('portuguese')
+nlp = spacy.load("pt_core_news_sm")
 
 
 with open('DICIONÁRIOS\oplexicon_v3.0\oplexicon.csv', encoding='utf8') as csvfile:
@@ -25,7 +28,7 @@ with open('DICIONÁRIOS\oplexicon_v3.0\oplexicon.csv', encoding='utf8') as csvfi
          if i > 0:
              palavra = oplexico[i][0]
              polaridade = oplexico[i][1]
-             print(palavra, polaridade)
+             #print(palavra, polaridade)
              dicionario[palavra] = polaridade
 
 
@@ -37,7 +40,7 @@ with open('DICIONÁRIOS\lexiconPT-master\data-raw\lexicon.csv', encoding='utf8')
         if i > 0:
             palavra = lexicon[i][0]
             polaridade = lexicon[i][1]
-            print(palavra, polaridade)
+            #print(palavra, polaridade)
             dicionario[palavra] = polaridade
 
 
@@ -49,7 +52,7 @@ with open('DICIONÁRIOS\wordNetAffect\wordnet.csv') as csvfile:
         if i > 0:
             palavra = wordnet[i][0]
             polaridade = wordnet[i][1]
-            print(palavra, polaridade)
+            #print(palavra, polaridade)
             dicionario[palavra] = polaridade
 
 
@@ -98,13 +101,15 @@ def Preprocessamento(texto) :
     texto = str(texto)
     texto = texto.lower()
     #documento = word_tokenize(texto)
-    documento = tokenize.word_tokenize(texto, language='portuguese')
+    documento = nlp(texto)
+    #documento = tokenize.word_tokenize(texto, language='portuguese')
     lista = []
     #Tokenizacao
     for token in documento:
-        lista.append(lemmas.lemmatize(token))
-    lista = [palavra for palavra in lista if palavra not in stopwords and palavra not in pontuacao] # retira stopwords
-    lista = ' '.join([str(elemento) for elemento in lista if not elemento.isdigit()]) # retira digitos
+        lista.append(token.lemma_)
+        #print(lemmas.lemmatize(token)) Não funciona pt-br
+    lista = [palavra for palavra in lista if palavra not in stopwords and palavra not in pontuacao and not palavra.isdigit()] # retira stopwords
+    #lista = ' '.join([str(elemento) for elemento in lista if not elemento.isdigit()]) # retira digitos
     return lista
 
 
@@ -138,7 +143,7 @@ scores = []
 scores = chat0104['MENSAGEM'].apply(analises)
 chat0104dic = pandas.DataFrame(chat0104)
 chat0104dic['POLARIDADE'] = scores
-chat0104dic.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-analise.csv', index = False)
+chat0104dic.to_csv(r'ANALISE DOS DADOS\CHATS\Chat_ATIV_01_04\Chat_ATIV_01_04-analise-ntlk.csv', index = False)
 
 
 """
